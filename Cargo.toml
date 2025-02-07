@@ -11,6 +11,7 @@ futures-util          = "0.3.28"
 log                   = "0.4.25"
 #mdbook-i18n-helpers   = {version = "0.3.3", path = "../mdbook-i18n-helpers/i18n-helpers"}
 mdbook-i18n-helpers   = {git = "https://github.com/dalance/mdbook-i18n-helpers.git", branch = "export_xgettext"}
+polib                 = "0.2.0"
 serde                 = "1.0"
 tera                  = "1.20"
 tokio                 = {version = "1.28.1", features = ["macros", "rt-multi-thread"]}

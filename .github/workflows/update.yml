@@ -1,4 +1,4 @@
-name: Submodule Update
+name: Update
 
 on:
   schedule:
@@ -10,12 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
       - name: Update submodules
         run: |
           git submodule init
           git submodule update --remote
+      - name: Update statistics
+        run: |
+          cargo run --release -- stat > site/stat.md
       - uses: EndBug/add-and-commit@v9
         with:
           default_author: github_actions
-          message: "Update submodules"
-          add: 'repos'
+          message: "Periodic update"

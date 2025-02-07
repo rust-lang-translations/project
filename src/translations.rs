@@ -6,6 +6,7 @@ use mdbook::MDBook;
 use mdbook_i18n_helpers::renderers::Xgettext;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
@@ -27,6 +28,23 @@ pub struct Book {
 pub struct Translation {
     pub id: String,
     pub name: String,
+}
+
+#[allow(unused)]
+#[derive(Clone, Debug)]
+pub struct TranslationStat {
+    pub name: String,
+    pub title: String,
+    pub langs: HashMap<String, TranslationLangStat>,
+}
+
+#[allow(unused)]
+#[derive(Clone, Debug)]
+pub struct TranslationLangStat {
+    pub lang_name: String,
+    pub total_text: usize,
+    pub translated_text: usize,
+    pub translation_ratio: f32,
 }
 
 impl Translations {
@@ -139,6 +157,42 @@ impl Translations {
         }
 
         Ok(())
+    }
+
+    pub fn stat(&self) -> Result<Vec<TranslationStat>> {
+        let mut ret = Vec::new();
+
+        for (name, book) in &self.books {
+            let src_path = self.src_path(&book.path);
+            let po_path = self.po_path(name);
+            let mdbook = MDBook::load(&src_path)?;
+            let title = mdbook.config.book.title.unwrap_or("".to_string());
+
+            let mut stat = TranslationStat {
+                name: name.clone(),
+                title: title.clone(),
+                langs: HashMap::new(),
+            };
+
+            for lang in &book.translations {
+                let lang_po = po_path.join(format!("{}.po", lang.id));
+                let catalog = polib::po_file::parse(&lang_po)?;
+                let total_text = catalog.count();
+                let translated_text = catalog.messages().filter(|x| x.is_translated()).count();
+                let translation_ratio = translated_text as f32 / total_text as f32;
+
+                let lang_stat = TranslationLangStat {
+                    lang_name: lang.name.clone(),
+                    total_text,
+                    translated_text,
+                    translation_ratio,
+                };
+                stat.langs.insert(lang.id.clone(), lang_stat);
+            }
+            ret.push(stat);
+        }
+
+        Ok(ret)
     }
 
     fn src_path(&self, path: &Path) -> PathBuf {

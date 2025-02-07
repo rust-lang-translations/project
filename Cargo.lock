@@ -1697,6 +1697,7 @@ dependencies = [
  "log",
  "mdbook",
  "mdbook-i18n-helpers",
+ "polib",
  "serde",
  "tera",
  "tokio",
