@@ -44,3 +44,7 @@ All the documents have a language selector at the top right of the pages.
 If you want to add other documents, please open a [issue](https://github.com/rust-lang-translations/translations/issues).
 
 The official [Rust By Example](https://doc.rust-lang.org/rust-by-example) already has some translations, so this project doesn't include it.
+
+# Translation Statistics
+
+{{ include(path="../stat.md") }}
